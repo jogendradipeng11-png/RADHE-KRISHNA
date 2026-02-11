@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Radhe Krishna File Library</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg-light: radial-gradient(circle at top, #ffd6e8 0, #fff 40%, #ffe9b3 100%);
+      --card-light: #ffffff;
+      --text-light: #222;
+      --border-light: #ffd1f0;
+
+      --bg-dark: #000000;
+      --card-dark: #111111;
+      --text-dark: #f7e9b0;
+      --border-dark: #b8860b;
+
+      --accent-pink: #ff7eb3;
+      --accent-orange: #ffb347;
+      --accent-gold: #ffd700;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px 0 80px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    body.dark {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 520px;
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+      transition: background 0.3s ease, border-color 0.3s ease;
+      margin: 8px;
+    }
+
+    body.dark .app-container {
+      background: rgba(10, 10, 10, 0.96);
+      border-color: var(--border-dark);
+    }
+
+    .header {
+      background: linear-gradient(135deg, #ff7eb3, #ff758c, #ffb347);
+      padding: 14px 12px 10px;
+      color: white;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    body.dark .header {
+      background: linear-gradient(135deg, #000000, #2b1b00, #8b6508);
+    }
+
+    .header-left {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .header h1 {
+      font-size: 19px;
+      font-weight: 700;
+      margin: 0 0 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header p {
+      font-size: 11px;
+      opacity: 0.9;
+      margin: 0;
+    }
+
+    .radhe-tag {
+      position: absolute;
+      right: 12px;
+      top: 8px;
+      background: rgba(255, 255, 255, 0.18);
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .rk-image-wrap {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      flex-shrink: 0;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+    }
+
+    .rk-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+      font-size: 11px;
+    }
+
+    .dark-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .dark-toggle span {
+      font-size: 13px;
+    }
+
+    .content {
+      padding: 12px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ffe0f2;
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    body.dark .card {
+      background: #111111;
+      border-color: #3b2a00;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title span {
+      font-size: 11px;
+      color: #777;
+      font-weight: 400;
+    }
+
+    body.dark .card-title span {
+      color: #d2c48a;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    label {
+      font-size: 12px;
+      color: #555;
+    }
+
+    body.dark label {
+      color: #f0e0a0;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="file"] {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-size: 13px;
+      background: #ffffff;
+      color: #222;
+      transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    body.dark input[type="text"],
+    body.dark input[type="password"],
+    body.dark input[type="file"] {
+      background: #181818;
+      color: #f7e9b0;
+      border-color: #444;
+    }
+
+    input[type="file"] {
+      padding: 5px 4px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s, color 0.2s;
+    }
+
+    button:active {
+      transform: scale(0.97);
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ff7eb3, #ff758c);
+      color: white;
+      box-shadow: 0 4px 10px rgba(255, 117, 140, 0.4);
+    }
+
+    body.dark .btn-primary {
+      background: linear-gradient(135deg, #8b6508, #ffb347);
+      box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+      color: #000;
+    }
+
+    .btn-secondary {
+      background: #f3f3f3;
+      color: #444;
+    }
+
+    body.dark .btn-secondary {
+      background: #222;
+      color: #f7e9b0;
+    }
+
+    .btn-danger {
+      background: #ff4b5c;
+      color: white;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #ddd;
+      color: #444;
+    }
+
+    body.dark .btn-outline {
+      border-color: #555;
+      color: #f7e9b0;
+    }
+
+    .btn-small {
+      padding: 4px 8px;
+      font-size: 11px;
+    }
+
+    .btn-full {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .login-section,
+    .main-section {
+      display: none;
+    }
+
+    .login-section.active,
+    .main-section.active {
+      display: block;
+    }
+
+    .status {
+      font-size: 11px;
+      margin-top: 4px;
+      min-height: 14px;
+    }
+
+    .status.ok {
+      color: #0a8f3c;
+    }
+
+    .status.err {
+      color: #d7263d;
+    }
+
+    body.dark .status.ok {
+      color: #9cffb0;
+    }
+
+    body.dark .status.err {
+      color: #ff7b7b;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .search-row input {
+      flex: 1;
+    }
+
+    .files-list {
+      max-height: 260px;
+      overflow-y: auto;
+      border-radius: 8px;
+      border: 1px solid #eee;
+      padding: 4px;
+    }
+
+    body.dark .files-list {
+      border-color: #333;
+    }
+
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 4px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 12px;
+    }
+
+    body.dark .file-item {
+      border-bottom-color: #333;
+    }
+
+    .file-name {
+      flex: 1;
+      margin-right: 6px;
+      word-break: break-all;
+    }
+
+    .file-actions {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .viewer {
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #eee;
+      height: 260px;
+    }
+
+    body.dark .viewer {
+      border-color: #333;
+    }
+
+    .viewer iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #000;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 11px;
+      color: #777;
+      margin-top: 6px;
+      padding-bottom: 4px;
+    }
+
+    body.dark .footer-note {
+      color: #d2c48a;
+    }
+
+    .krishna-badge {
+      font-size: 11px;
+      color: #ff5c8a;
+      font-weight: 600;
+    }
+
+    body.dark .krishna-badge {
+      color: #ffd700;
+    }
+
+    /* Loader overlay */
+    .loader-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .loader-overlay.active {
+      display: flex;
+    }
+
+    .rk-loader {
+      text-align: center;
+      color: #ffd700;
+      font-family: "Segoe UI", system-ui, sans-serif;
+    }
+
+    .rk-loader-text {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-shadow: 0 0 8px rgba(255, 215, 0, 0.9), 0 0 16px rgba(255, 140, 0, 0.8);
+      animation: rkGlow 1.6s ease-in-out infinite alternate;
+    }
+
+    .rk-loader-sub {
+      font-size: 11px;
+      margin-top: 6px;
+      color: #ffe9a0;
+    }
+
+    @keyframes rkGlow {
+      0% {
+        text-shadow: 0 0 4px rgba(255, 215, 0, 0.6),
+                     0 0 10px rgba(255, 140, 0, 0.5);
+        transform: scale(1);
+      }
+      100% {
+        text-shadow: 0 0 10px rgba(255, 215, 0, 1),
+                     0 0 22px rgba(255, 140, 0, 0.9);
+        transform: scale(1.05);
+      }
+    }
+
+    /* Splash screen */
+    .splash {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100000;
+      animation: fadeOut 2.2s ease forwards;
+    }
+
+    .splash-img {
+      width: 220px;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 50%;
+      box-shadow: 0 0 25px gold, 0 0 45px #ffb347;
+      animation: popIn 1.2s ease;
+    }
+
+    .splash-text {
+      margin-top: 18px;
+      font-size: 28px;
+      font-weight: 700;
+      color: gold;
+      text-shadow: 0 0 12px gold, 0 0 22px orange;
+      animation: glowPulse 1.6s infinite alternate;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.3); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes glowPulse {
+      0% { text-shadow: 0 0 8px gold; }
+      100% { text-shadow: 0 0 22px orange; }
+    }
+
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+
+    /* Bottom nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 62px;
+      background: linear-gradient(135deg, #000, #2b1b00, #8b6508);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid gold;
+      z-index: 9999;
+    }
+
+    .nav-item {
+      color: gold;
+      font-size: 14px;
+      text-align: center;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .nav-item span {
+      font-size: 10px;
+      opacity: 0.8;
+    }
+
+    .nav-item:active {
+      transform: scale(0.9);
+    }
+
+    @media (max-width: 480px) {
+      .header h1 {
+        font-size: 17px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- SPLASH SCREEN -->
+  <div id="splashScreen" class="splash">
+    <img class="splash-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzkmvy8fiaVGfSpShf3-PGhvbtlgVkswpwyA&s" alt="Radha Krishna" />
+    <div class="splash-text">Radhe Krishna</div>
+  </div>
+
+  <!-- Glowing Radhe Krishna loader -->
+  <div id="loaderOverlay" class="loader-overlay">
+    <div class="rk-loader">
+      <div class="rk-loader-text">Radhe Krishna</div>
+      <div class="rk-loader-sub">Loading your divine files... (ଆପଣଙ୍କ ଫାଇଲ୍ ଲୋଡ୍ ହେଉଛି)</div>
+    </div>
+  </div>
+
+  <div class="app-container">
+    <div class="header">
+      <div class="radhe-tag">Radhe Krishna ✨</div>
+
+      <div class="rk-image-wrap">
+        <img src="https://asset.gecdesigns.com/img/wallpapers/cute-radha-krishna-hd-wallpaper-sr04112404-cover.webp" alt="Radha Krishna" />
+      </div>
+
+      <div class="header-left">
+        <h1>Radhe Krishna File Library</h1>
+        <p>Secure personal document space with voice search</p>
+        <div class="top-bar">
+          <div>Private access (କେବଳ ଆପଣଙ୍କ ପାଇଁ)</div>
+          <div id="darkToggle" class="dark-toggle">
+            <span>☀️</span> <span>Light / Dark</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- LOGIN SECTION -->
+      <div id="loginSection" class="login-section active card">
+        <div class="card-title">
+          Login (ଲଗିନ୍ କରନ୍ତୁ)
+          <span>Only you can access your files (କେବଳ ଆପଣଙ୍କ ପାଇଁ)</span>
+        </div>
+        <div class="input-group">
+          <label for="loginUsername">Username (ଉପଯୋଗକର୍ତ୍ତା ନାମ)</label>
+          <input type="text" id="loginUsername" placeholder="Enter username" />
+        </div>
+        <div class="input-group">
+          <label for="loginPassword">Password (ପାସୱାର୍ଡ)</label>
+          <input type="password" id="loginPassword" placeholder="Enter password" />
+        </div>
+        <button id="loginBtn" class="btn-primary btn-full">
+          Login (ଲଗିନ୍ କରନ୍ତୁ)
+        </button>
+        <div id="loginStatus" class="status"></div>
+      </div>
+
+      <!-- MAIN SECTION -->
+      <div id="mainSection" class="main-section">
+        <!-- Upload card -->
+        <div class="card">
+          <div class="card-title">
+            Upload / Rename (ଅପଲୋଡ୍ / ନାମ ପରିବର୍ତ୍ତନ)
+            <span>Store PDFs, images, docs (PDF, ଛବି, ଡକ୍ୟୁମେଣ୍ଟ)</span>
+          </div>
+
+          <div class="input-group">
+            <label for="fileInput">Choose file (ଫାଇଲ୍ ବାଛନ୍ତୁ)</label>
+            <input type="file" id="fileInput" />
+          </div>
+
+          <div class="input-group">
+            <label for="fileNameInput">Save as name (ନାମ ଦେଇ ସେଭ୍ କରନ୍ତୁ)</label>
+            <input
+              type="text"
+              id="fileNameInput"
+              placeholder="Example: AadhaarCard.pdf"
+            />
+          </div>
+
+          <button id="uploadBtn" class="btn-primary btn-full">
+            Upload with this name (ଏହି ନାମରେ ଅପଲୋଡ୍)
+          </button>
+          <div id="uploadStatus" class="status"></div>
+        </div>
+
+        <!-- Files list card -->
+        <div class="card">
+          <div class="card-title">
+            Your Files (ଆପଣଙ୍କ ଫାଇଲ୍)
+            <span>Tap to open, manage, or search (ଖୋଲନ୍ତୁ, ପରିଚାଳନା, ସନ୍ଧାନ)</span>
+          </div>
+
+          <div class="search-row">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search files (ଫାଇଲ୍ ସନ୍ଧାନ କରନ୍ତୁ)..."
+            />
+            <button id="voiceBtn" class="btn-secondary" title="Voice search">
+              🎤
+            </button>
+          </div>
+
+          <div id="filesList" class="files-list"></div>
+          <div id="filesStatus" class="status"></div>
+        </div>
+
+        <!-- Password change card -->
+        <div class="card">
+          <div class="card-title">
+            Change Password (ପାସୱାର୍ଡ ପରିବର୍ତ୍ତନ)
+            <span>Only for current user (କେବଳ ଏହି ଉପଯୋଗକର୍ତ୍ତା ପାଇଁ)</span>
+          </div>
+
+          <div class="input-group">
+            <label for="oldPassword">Old password (ପୁରୁଣା ପାସୱାର୍ଡ)</label>
+            <input type="password" id="oldPassword" placeholder="Enter old password" />
+          </div>
+
+          <div class="input-group">
+            <label for="newPassword">New password (ନୂତନ ପାସୱାର୍ଡ)</label>
+            <input type="password" id="newPassword" placeholder="Enter new password" />
+          </div>
+
+          <div class="input-group">
+            <label for="confirmPassword">Confirm new password (ନୂତନ ପାସୱାର୍ଡ ପୁନରାୟ)</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              placeholder="Re-enter new password"
+            />
+          </div>
+
+          <button id="changePasswordBtn" class="btn-secondary btn-full">
+            Change Password (ପାସୱାର୍ଡ ପରିବର୍ତ୍ତନ କରନ୍ତୁ)
+          </button>
+          <div id="passwordStatus" class="status"></div>
+        </div>
+
+        <!-- Logout -->
+        <div class="card">
+          <button id="logoutBtn" class="btn-outline btn-full">
+            Logout (ଲଗ୍ ଆଉଟ୍)
+          </button>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        <span class="krishna-badge">Radhe Krishna</span> • Your files stay in your
+        private space (ଆପଣଙ୍କ ଫାଇଲ୍ ସୁରକ୍ଷିତ)
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAVIGATION BAR -->
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="scrollToTop()">
+      🏠<br><span>Home</span>
+    </div>
+    <div class="nav-item" onclick="document.getElementById('fileInput').click()">
+      ⬆️<br><span>Upload</span>
+    </div>
+    <div class="nav-item" onclick="loadFiles()">
+      📁<br><span>Files</span>
+    </div>
+    <div class="nav-item" onclick="openSettings()">
+      ⚙️<br><span>Settings</span>
+    </div>
+  </div>
+
+  <script>
+  const BASE_URL = "https://file-library-backend.onrender.com";
+
+  let currentUser = null;
+
+  const loginSection = document.getElementById("loginSection");
+  const mainSection = document.getElementById("mainSection");
+
+  const loginUsername = document.getElementById("loginUsername");
+  const loginPassword = document.getElementById("loginPassword");
+  const loginBtn = document.getElementById("loginBtn");
+  const loginStatus = document.getElementById("loginStatus");
+
+  const fileInput = document.getElementById("fileInput");
+  const fileNameInput = document.getElementById("fileNameInput");
+  const uploadBtn = document.getElementById("uploadBtn");
+  const uploadStatus = document.getElementById("uploadStatus");
+
+  const filesList = document.getElementById("filesList");
+  const filesStatus = document.getElementById("filesStatus");
+  const searchInput = document.getElementById("searchInput");
+  const voiceBtn = document.getElementById("voiceBtn");
+
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  const oldPassword = document.getElementById("oldPassword");
+  const newPassword = document.getElementById("newPassword");
+  const confirmPassword = document.getElementById("confirmPassword");
+  const changePasswordBtn = document.getElementById("changePasswordBtn");
+  const passwordStatus = document.getElementById("passwordStatus");
+
+  const loaderOverlay = document.getElementById("loaderOverlay");
+  const darkToggle = document.getElementById("darkToggle");
+  const splashScreen = document.getElementById("splashScreen");
+
+  function showLoader() {
+    loaderOverlay.classList.add("active");
+  }
+  function hideLoader() {
+    loaderOverlay.classList.remove("active");
+  }
+
+  loginBtn.addEventListener("click", async () => {
+    const username = loginUsername.value.trim();
+    const password = loginPassword.value.trim();
+
+    if (!username || !password) {
+      loginStatus.textContent = "Enter username & password (ନାମ ଏବଂ ପାସୱାର୍ଡ ଦିଅନ୍ତୁ)";
+      loginStatus.className = "status err";
+      return;
+    }
+
+    showLoader();
+
+    try {
+      const res = await fetch(BASE_URL + "/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+      hideLoader();
+
+      if (data.success) {
+        currentUser = username;
+        loginSection.classList.remove("active");
+        mainSection.classList.add("active");
+        loadFiles();
+      } else {
+        loginStatus.textContent = "Invalid login (ଭୁଲ ଲଗିନ୍)";
+        loginStatus.className = "status err";
+      }
+    } catch (e) {
+      hideLoader();
+      loginStatus.textContent = "Server error (ସର୍ଭର ତ୍ରୁଟି)";
+      loginStatus.className = "status err";
+    }
+  });
+
+  logoutBtn.addEventListener("click", () => {
+    currentUser = null;
+    mainSection.classList.remove("active");
+    loginSection.classList.add("active");
+    });
+
+  async function loadFiles() {
+    showLoader();
+    try {
+      const res = await fetch(BASE_URL + "/files");
+      const data = await res.json();
+      hideLoader();
+      renderFiles(data);
+    } catch (e) {
+      hideLoader();
+      filesStatus.textContent = "Failed to load files (ଫାଇଲ୍ ଲୋଡ୍ ବିଫଳ)";
+    }
+  }
+
+  function getFileIcon(name) {
+    const ext = name.split(".").pop().toLowerCase();
+
+    if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext)) return "🖼️";
+    if (["pdf"].includes(ext)) return "📄";
+    if (["mp4", "mkv", "mov"].includes(ext)) return "🎥";
+    if (["doc", "docx"].includes(ext)) return "📘";
+    if (["zip", "rar"].includes(ext)) return "📦";
+
+    return "📁";
+  }
+
+  async function getFileSize(name) {
+    try {
+      const res = await fetch(BASE_URL + "/file/" + encodeURIComponent(name), {
+        method: "HEAD"
+      });
+
+      const size = res.headers.get("content-length");
+      if (!size) return "Unknown";
+
+      const kb = size / 1024;
+      if (kb < 1024) return kb.toFixed(1) + " KB";
+      return (kb / 1024).toFixed(1) + " MB";
+    } catch {
+      return "Unknown";
+    }
+  }
+
+  async function renderFiles(files) {
+    filesList.innerHTML = "";
+
+    const query = searchInput.value.trim().toLowerCase();
+    const filtered = files.filter(f => f.toLowerCase().includes(query));
+
+    if (!filtered.length) {
+      filesList.innerHTML = `<div style="padding:6px;font-size:12px;color:#777;">No files found (କିଛି ମିଳିଲା ନାହିଁ)</div>`;
+      return;
+    }
+
+    for (const name of filtered) {
+      const size = await getFileSize(name);
+      const icon = getFileIcon(name);
+
+      const item = document.createElement("div");
+      item.className = "file-item";
+      item.innerHTML = `
+        <div class="file-name">${icon} ${name}<br><span style="font-size:10px;color:#888;">${size}</span></div>
+        <div class="file-actions">
+          <button class="btn-secondary btn-small" onclick="openFile('${name}')">Open</button>
+          <button class="btn-primary btn-small" onclick="renameFile('${name}')">Rename</button>
+          <button class="btn-danger btn-small" onclick="deleteFile('${name}')">Delete</button>
+        </div>
+      `;
+      filesList.appendChild(item);
+    }
+  }
+
+    function openFile(name) {
+      document.getElementById("fluteSound").play();
+  const url = BASE_URL + "/file/" + encodeURIComponent(name);
+
+  // Open file directly in the same tab, full screen
+  window.location.href = url;
+}
+
+  uploadBtn.addEventListener("click", async () => {
+    const file = fileInput.files[0];
+    let newName = fileNameInput.value.trim();
+
+    if (!file) {
+      uploadStatus.textContent = "Choose a file (ଫାଇଲ୍ ବାଛନ୍ତୁ)";
+      uploadStatus.className = "status err";
+      return;
+    }
+
+    if (!newName) {
+      uploadStatus.textContent = "Enter a name (ନାମ ଦିଅନ୍ତୁ)";
+      uploadStatus.className = "status err";
+      return;
+    }
+
+    if (!newName.includes(".")) {
+      const ext = file.name.split(".").pop();
+      newName += "." + ext;
+    }
+
+    const renamedFile = new File([file], newName, { type: file.type });
+    const formData = new FormData();
+    formData.append("file", renamedFile);
+
+    showLoader();
+
+    try {
+      await fetch(BASE_URL + "/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      hideLoader();
+      uploadStatus.textContent = "Uploaded (ଅପଲୋଡ୍ ସଫଳ)";
+      uploadStatus.className = "status ok";
+
+      fileInput.value = "";
+      fileNameInput.value = "";
+
+      loadFiles();
+    } catch {
+      hideLoader();
+      uploadStatus.textContent = "Upload failed (ଅପଲୋଡ୍ ବିଫଳ)";
+      uploadStatus.className = "status err";
+    }
+  });
+
+  async function renameFile(oldName) {
+    let newName = prompt("Enter new name (ନୂତନ ନାମ ଦିଅନ୍ତୁ):", oldName);
+    if (!newName) return;
+
+    if (!newName.includes(".")) {
+      const ext = oldName.split(".").pop();
+      newName += "." + ext;
+    }
+
+    const dummy = new File([""], newName);
+    const formData = new FormData();
+    formData.append("file", dummy);
+
+    showLoader();
+
+    try {
+      await fetch(BASE_URL + "/replace/" + encodeURIComponent(oldName), {
+        method: "POST",
+        body: formData
+      });
+
+      hideLoader();
+      loadFiles();
+    } catch {
+      hideLoader();
+      alert("Rename failed (ନାମ ପରିବର୍ତ୍ତନ ବିଫଳ)");
+    }
+  }
+
+  async function deleteFile(name) {
+    if (!confirm("Delete this file?\nଏହି ଫାଇଲ୍ ଡିଲିଟ୍ କରିବେ?\n" + name)) return;
+
+    showLoader();
+
+    try {
+      await fetch(BASE_URL + "/file/" + encodeURIComponent(name), {
+        method: "DELETE"
+      });
+
+      hideLoader();
+      loadFiles();
+    } catch {
+      hideLoader();
+      alert("Delete failed (ଡିଲିଟ୍ ବିଫଳ)");
+    }
+  }
+
+  changePasswordBtn.addEventListener("click", async () => {
+    const oldP = oldPassword.value.trim();
+    const newP = newPassword.value.trim();
+    const confirmP = confirmPassword.value.trim();
+
+    if (!oldP || !newP || !confirmP) {
+      passwordStatus.textContent = "Fill all fields (ସବୁ ଭରନ୍ତୁ)";
+      passwordStatus.className = "status err";
+      return;
+    }
+
+    if (newP !== confirmP) {
+      passwordStatus.textContent = "Passwords do not match (ମେଳ ନାହିଁ)";
+      passwordStatus.className = "status err";
+      return;
+    }
+
+    showLoader();
+
+    try {
+      const res = await fetch(BASE_URL + "/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: currentUser,
+          oldPassword: oldP,
+          newPassword: newP
+        })
+      });
+
+      const data = await res.json();
+      hideLoader();
+
+      if (data.success) {
+        passwordStatus.textContent = "Password changed (ପାସୱାର୍ଡ ପରିବର୍ତ୍ତିତ)";
+        passwordStatus.className = "status ok";
+      } else {
+        passwordStatus.textContent = data.message;
+        passwordStatus.className = "status err";
+      }
+    } catch {
+      hideLoader();
+      passwordStatus.textContent = "Error changing password";
+      passwordStatus.className = "status err";
+    }
+  });
+
+  searchInput.addEventListener("input", loadFiles);
+
+  voiceBtn.addEventListener("click", () => {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Voice search not supported");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-IN";
+    recognition.interimResults = false;
+
+    recognition.onresult = (e) => {
+      searchInput.value = e.results[0][0].transcript;
+      loadFiles();
+    };
+
+    recognition.start();
+  });
+
+  darkToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+  });
+
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function openSettings() {
+    alert("Scroll down to the Password Change section.");
+  }
+
+  window.addEventListener("load", () => {
+    loginSection.classList.add("active");
+    setTimeout(() => {
+      if (splashScreen) splashScreen.style.display = "none";
+    }, 2200);
+  });
+/* ⭐ STEP‑2 CODE STARTS HERE ⭐ */
+function closeFullViewer() {
+  document.getElementById("fullViewer").style.display = "none";
+  document.getElementById("fullViewerFrame").src = "";
+}
+let currentPage = 1;
+
+function nextPage() {
+  currentPage++;
+  loadPDFPage();
+}
+
+function prevPage() {
+  if (currentPage > 1) currentPage--;
+  loadPDFPage();
+}
+
+function loadPDFPage() {
+  const frame = document.getElementById("fullViewerFrame");
+  const url = frame.src.split("#")[0] + "#page=" + currentPage;
+  frame.src = url;
+  document.getElementById("pageNumber").textContent = currentPage;
+}
+/* ⭐ STEP‑2 CODE ENDS HERE ⭐ */
+
+  </script>
+  <audio id="fluteSound" src="https://archive.org/download/om-flute/Om%20Flute.mp3"></audio>
+</body>
+</html>
