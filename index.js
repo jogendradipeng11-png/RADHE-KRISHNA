@@ -1,120 +1,103 @@
-const express = require("express");
-const session = require("express-session");
-const cors = require("cors");
-const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
+// index.js
+const express = require('express');
+const session = require('express-session');
+const cors = require('cors');
+const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
 
-const userDB = require("./user");
+const { USERNAME, PASSWORD, validateUser } = require('./user');
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// ===== CONFIG =====
-const PORT = process.env.PORT || 8080;
-const BASE_URL = process.env.BASE_URL || "http://localhost:" + PORT;
-
-// ===== FOLDERS =====
-const FILE_DIR = path.join(__dirname, "uploads");
-if (!fs.existsSync(FILE_DIR)) fs.mkdirSync(FILE_DIR);
-
-// ===== MIDDLEWARE =====
+// Middleware
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
-
-app.use(cors({
-  origin: true,
-  credentials: true
-}));
-
+app.use(express.urlencoded({ extended: true }));
 app.use(session({
   secret: "radhekrishna-secret",
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: true,
+  cookie: { maxAge: 24 * 60 * 60 * 1000 } // 1 day
 }));
 
-// ===== FILE STORAGE =====
-const storage = multer.diskStorage({
-  destination: FILE_DIR,
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  }
-});
+// Create uploads folder if missing
+const UPLOAD_DIR = path.join(__dirname, 'uploads');
+if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
 
+// Multer setup
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
+  filename: (req, file, cb) => cb(null, file.originalname)
+});
 const upload = multer({ storage });
 
-// ===== AUTH MIDDLEWARE =====
-function auth(req, res, next) {
-  if (!req.session.user) {
-    return res.status(401).json({ error: "Not logged in" });
-  }
-  next();
-}
-
-// ===== ROUTES =====
-
-// Register
-app.post("/register", (req, res) => {
-  const { username, password } = req.body;
-
-  if (!username || !password) {
-    return res.json({ success: false, error: "Missing fields" });
-  }
-
-  const result = userDB.register(username, password);
-  res.json(result);
-});
+// ------------------- ROUTES ------------------- //
 
 // Login
-app.post("/login", (req, res) => {
+app.post('/login', (req, res) => {
   const { username, password } = req.body;
-
-  if (userDB.login(username, password)) {
+  if (validateUser(username, password)) {
     req.session.user = username;
-    return res.json({ success: true });
+    return res.json({ success: true, message: "Login successful" });
+  } else {
+    return res.json({ success: false, message: "Invalid username or password" });
   }
-
-  res.json({ success: false, error: "Invalid credentials" });
 });
 
-// Upload
-app.post("/upload", auth, upload.single("file"), (req, res) => {
-  res.json({ success: true });
-});
+// Middleware to protect routes
+function requireLogin(req, res, next) {
+  if (req.session.user === USERNAME) return next();
+  res.status(401).json({ error: "Not authorized" });
+}
 
-// List Files
-app.get("/files", auth, (req, res) => {
-  const files = fs.readdirSync(FILE_DIR);
-  res.json(files);
-});
-
-// Get File URL
-app.get("/file/:name", auth, (req, res) => {
-  const filePath = path.join(FILE_DIR, req.params.name);
-
-  if (!fs.existsSync(filePath)) {
-    return res.json({ success: false, error: "File not found" });
-  }
-
-  res.json({
-    success: true,
-    url: BASE_URL + "/uploads/" + encodeURIComponent(req.params.name)
+// List files
+app.get('/files', requireLogin, (req, res) => {
+  fs.readdir(UPLOAD_DIR, (err, files) => {
+    if (err) return res.status(500).json({ error: "Failed to list files" });
+    res.json(files);
   });
 });
 
-// Delete File
-app.delete("/file/:name", auth, (req, res) => {
-  const filePath = path.join(FILE_DIR, req.params.name);
-
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-  }
-
-  res.json({ success: true });
+// Upload file
+app.post('/upload', requireLogin, upload.single('file'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+  res.json({ success: true, filename: req.file.originalname });
 });
 
-// Static serve uploads
-app.use("/uploads", express.static(FILE_DIR));
-
-// ===== START =====
-app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
+// Download file info
+app.get('/file/:name', requireLogin, (req, res) => {
+  const filePath = path.join(UPLOAD_DIR, req.params.name);
+  if (!fs.existsSync(filePath)) return res.status(404).json({ error: "File not found" });
+  res.json({ success: true, downloadUrl: `/download/${encodeURIComponent(req.params.name)}` });
 });
+
+// Serve file for download
+app.get('/download/:name', requireLogin, (req, res) => {
+  const filePath = path.join(UPLOAD_DIR, req.params.name);
+  if (!fs.existsSync(filePath)) return res.status(404).send("File not found");
+  res.download(filePath);
+});
+
+// Delete file
+app.delete('/file/:name', requireLogin, (req, res) => {
+  const filePath = path.join(UPLOAD_DIR, req.params.name);
+  if (!fs.existsSync(filePath)) return res.status(404).json({ error: "File not found" });
+  fs.unlink(filePath, err => {
+    if (err) return res.status(500).json({ error: "Failed to delete file" });
+    res.json({ success: true, message: "File deleted" });
+  });
+});
+
+// Logout
+app.post('/logout', (req, res) => {
+  req.session.destroy();
+  res.json({ success: true, message: "Logged out successfully" });
+});
+
+// Serve static frontend (optional)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Start server
+app.listen(PORT, () => console.log(`Radhe Krishna backend running on port ${PORT}`));
