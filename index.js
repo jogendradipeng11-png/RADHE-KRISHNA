@@ -16,58 +16,41 @@ const {
 
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const bcrypt = require("bcryptjs");
-const { findUser, addUser } = require("./users.js");
+
+// Simple in-memory user storage (replace with DB if needed)
+const fs = require("fs");
+const USERS_FILE = "./users.json";
+
+function loadUsers() {
+  if (!fs.existsSync(USERS_FILE)) {
+    fs.writeFileSync(USERS_FILE, JSON.stringify({ admin: bcrypt.hashSync("r", 10) }));
+  }
+  return JSON.parse(fs.readFileSync(USERS_FILE));
+}
+
+function saveUsers(users) {
+  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+}
+
+function findUser(username) {
+  const users = loadUsers();
+  if (!users[username]) return null;
+  return { username, password: users[username] };
+}
+
+async function addUser(username, password) {
+  const users = loadUsers();
+  if (users[username]) throw new Error("User already exists");
+  users[username] = await bcrypt.hash(password, 10);
+  saveUsers(users);
+  return { username };
+}
 
 const app = express();
 const PORT = process.env.PORT || 10000;
 
 // ============================
-// CORS & SESSION CONFIG
-// ============================
-
-// Allowed frontend URLs
-const allowedOrigins = [
-  "https://radhe-krishna-h7lq.onrender.com", // Render frontend
-  "https://jogendradipeng11-png.github.io",  // GitHub Pages
-  "http://localhost:5500",
-  "http://127.0.0.1:5500"
-];
-
-// Enable CORS with credentials
-app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin) return callback(null, true); // allow curl/Postman
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("CORS Not Allowed"));
-    }
-  },
-  credentials: true
-}));
-
-// Parse JSON
-app.use(express.json());
-
-// ============================
-// SESSION SETUP
-// ============================
-app.set("trust proxy", 1); // for Render / production
-
-app.use(session({
-  secret: process.env.JWT_SECRET || "rk-secret",
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === "production", // HTTPS required
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    httpOnly: true,
-    maxAge: 14 * 24 * 60 * 60 * 1000
-  }
-}));
-
-// ============================
-// IDrive S3 CLIENT
+// IDrive S3 Client
 // ============================
 const s3 = new S3Client({
   region: "auto",
@@ -82,12 +65,50 @@ const s3 = new S3Client({
 const BUCKET = process.env.IDRIVE_BUCKET_NAME;
 
 // ============================
-// MULTER SETUP
+// Multer
 // ============================
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 25 * 1024 * 1024 }
 });
+
+// ============================
+// CORS for GitHub Pages + Render frontend
+// ============================
+const allowedOrigins = [
+  "https://jogendradipeng11-png.github.io",
+  "https://radhe-krishna-h7lq.onrender.com"
+];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error("CORS Not Allowed"));
+  },
+  credentials: true
+}));
+
+app.options("*", cors());
+
+// ============================
+// SESSION (cross-origin safe)
+// ============================
+app.set("trust proxy", 1); // important on Render
+
+app.use(session({
+  secret: process.env.JWT_SECRET || "rk-secret",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: true,        // HTTPS required
+    sameSite: "none",    // allow GitHub Pages cross-origin
+    httpOnly: true,
+    maxAge: 14 * 24 * 60 * 60 * 1000
+  }
+}));
+
+app.use(express.json());
 
 // ============================
 // AUTH MIDDLEWARE
@@ -102,8 +123,6 @@ const requireLogin = (req, res, next) => {
 // ============================
 // ROUTES
 // ============================
-
-// Test backend
 app.get("/", (req, res) => {
   res.json({ message: "Radhe Krishna Backend Running" });
 });
@@ -142,17 +161,16 @@ app.post("/logout", (req, res) => {
 
 // UPLOAD
 app.post("/upload", requireLogin, upload.single("file"), async (req, res) => {
-  try {
-    const username = req.session.user.username;
-    const key = `${username}/${Date.now()}-${req.file.originalname}`;
+  const username = req.session.user.username;
+  const key = `${username}/${Date.now()}-${req.file.originalname}`;
 
+  try {
     await s3.send(new PutObjectCommand({
       Bucket: BUCKET,
       Key: key,
       Body: req.file.buffer,
       ContentType: req.file.mimetype
     }));
-
     res.json({ success: true });
   } catch (err) {
     console.error(err);
@@ -162,8 +180,9 @@ app.post("/upload", requireLogin, upload.single("file"), async (req, res) => {
 
 // LIST FILES
 app.get("/files", requireLogin, async (req, res) => {
+  const prefix = req.session.user.username + "/";
+
   try {
-    const prefix = req.session.user.username + "/";
     const data = await s3.send(new ListObjectsV2Command({
       Bucket: BUCKET,
       Prefix: prefix
@@ -177,10 +196,11 @@ app.get("/files", requireLogin, async (req, res) => {
   }
 });
 
-// DOWNLOAD FILE
+// DOWNLOAD
 app.get("/file/:name", requireLogin, async (req, res) => {
+  const key = `${req.session.user.username}/${req.params.name}`;
+
   try {
-    const key = `${req.session.user.username}/${req.params.name}`;
     const url = await getSignedUrl(
       s3,
       new GetObjectCommand({ Bucket: BUCKET, Key: key }),
@@ -193,10 +213,11 @@ app.get("/file/:name", requireLogin, async (req, res) => {
   }
 });
 
-// DELETE FILE
+// DELETE
 app.delete("/file/:name", requireLogin, async (req, res) => {
+  const key = `${req.session.user.username}/${req.params.name}`;
+
   try {
-    const key = `${req.session.user.username}/${req.params.name}`;
     await s3.send(new DeleteObjectCommand({ Bucket: BUCKET, Key: key }));
     res.json({ success: true });
   } catch (err) {
@@ -205,9 +226,7 @@ app.delete("/file/:name", requireLogin, async (req, res) => {
   }
 });
 
-// ============================
 // START SERVER
-// ============================
 app.listen(PORT, () => {
   console.log("Server running:", PORT);
 });
